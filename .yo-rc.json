@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "skibitsky",
+      "authorEmail": "gleb@skibitsky.com",
+      "authorUrl": "https://skibitsky.com"
+    }
+  }
+}
