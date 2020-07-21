@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
-const path = require("path");
-const ini = require("ini");
-const YeomanGenerator = require("yeoman-generator");
+const _ = require('lodash');
+const path = require('path');
+const ini = require('ini');
+const YeomanGenerator = require('yeoman-generator');
 
 module.exports = class Generator extends YeomanGenerator {
   constructor() {
@@ -15,21 +15,21 @@ module.exports = class Generator extends YeomanGenerator {
     normalizeOptions(this.options);
 
     const defaults = getDefaults(this.destinationRoot(), this.options);
-    const existing = this.fs.readJSON("package.json");
+    const existing = this.fs.readJSON('package.json');
 
-    if (!this.options.repository && this.fs.exists(".git/config")) {
-      this.options["skip-repo"] = true;
+    if (!this.options.repository && this.fs.exists('.git/config')) {
+      this.options['skip-repo'] = true;
       _.merge(this.options, getRepositoryInformationFromGit(this.fs));
     }
 
     const options = _.reduce(
       this.options,
       (memo, v, k) =>
-        k.indexOf("skip-") === 0 ? memo : _.extend(memo, { [k]: v }),
+        k.indexOf('skip-') === 0 ? memo : _.extend(memo, { [k]: v }),
       {}
     );
 
-    if (this.options["skip-test"]) {
+    if (this.options['skip-test']) {
       delete defaults.scripts.test;
     }
 
@@ -38,23 +38,23 @@ module.exports = class Generator extends YeomanGenerator {
 
   async prompting() {
     const prompts = [
-      ["name", "package name"],
-      ["version"],
-      ["displayName", "user-friendly name"],
-      ["description"],
-      ["unity", "unity version"],
-      ["repo", "git repository"],
+      ['name', 'package name'],
+      ['version'],
+      ['displayName', 'user-friendly name'],
+      ['description'],
+      ['unity', 'unity version'],
+      ['repo', 'git repository'],
       [
-        "keywords",
-        "keywords (space-delimited)",
-        this.package.keywords ? this.package.keywords.join(" ") : ""
+        'keywords',
+        'keywords (space-delimited)',
+        this.package.keywords ? this.package.keywords.join(' ') : ''
       ],
-      ["author"],
-      ["license"]
+      ['author'],
+      ['license']
     ]
       .filter(([name]) => !this.options[`skip-${name}`])
       .map(([name, message = name, defaultV = this.package[name]]) => ({
-        type: "input",
+        type: 'input',
         name,
         message: `${message}:`,
         default: defaultV
@@ -67,7 +67,7 @@ module.exports = class Generator extends YeomanGenerator {
       const res = await this.prompt(prompts);
 
       if (res.keywords && !res.keywords.match(/^\w?$/)) {
-        res.keywords = res.keywords.split(" ");
+        res.keywords = res.keywords.split(' ');
       }
 
       if (res.repo) {
@@ -80,18 +80,18 @@ module.exports = class Generator extends YeomanGenerator {
       // Strip extraneous props
       pkg = _.reduce(
         [
-          "name",
-          "version",
-          "displayName",
-          "description",
-          "unity",
-          "repository",
-          "bugs",
-          "homepage",
-          "keywords",
-          "author",
-          "license",
-          "dependencies"
+          'name',
+          'version',
+          'displayName',
+          'description',
+          'unity',
+          'repository',
+          'bugs',
+          'homepage',
+          'keywords',
+          'author',
+          'license',
+          'dependencies'
         ],
         (accum, k) => _.extend(accum, { [k]: pkg[k] }),
         {}
@@ -100,9 +100,9 @@ module.exports = class Generator extends YeomanGenerator {
       /* eslint-disable no-await-in-loop */
       const { confirmed } = await this.prompt([
         {
-          type: "confirm",
-          name: "confirmed",
-          message: JSON.stringify(pkg, null, 2) + "\n\nIs this OK?",
+          type: 'confirm',
+          name: 'confirmed',
+          message: JSON.stringify(pkg, null, 2) + '\n\nIs this OK?',
           default: true
         }
       ]);
@@ -112,10 +112,10 @@ module.exports = class Generator extends YeomanGenerator {
         /* eslint-disable no-await-in-loop */
         this.companyName = await this.prompt([
           {
-            type: "input",
-            name: "companyName",
-            message: "company name (for .asmdef)",
-            default: toTitleCase(res.author).replace(/\s/g, ""),
+            type: 'input',
+            name: 'companyName',
+            message: 'company name (for .asmdef)',
+            default: toTitleCase(res.author).replace(/\s/g, ''),
             store: true
           }
         ]);
@@ -126,7 +126,7 @@ module.exports = class Generator extends YeomanGenerator {
         prompts.forEach(p => {
           // Keywords
           if (Array.isArray(pkg[p.name])) {
-            p.default = pkg[p.name].join(" ");
+            p.default = pkg[p.name].join(' ');
           } else {
             p.default = pkg[p.name];
           }
@@ -136,7 +136,7 @@ module.exports = class Generator extends YeomanGenerator {
   }
 
   writing() {
-    this.fs.writeJSON(this.destinationPath("package.json"), this.package);
+    this.fs.writeJSON(this.destinationPath('package.json'), this.package);
   }
 };
 
@@ -154,12 +154,12 @@ function getDefaults(fd, options) {
   return _.reduce(
     {
       name: basename,
-      version: "1.0.0",
+      version: '1.0.0',
       displayName: toTitleCase(basename),
-      description: "",
-      unity: "",
+      description: '',
+      unity: '',
       keywords: [],
-      license: "MIT",
+      license: 'MIT',
       dependencies: {}
     },
     (memo, v, k) => (options[`skip-${k}`] ? memo : _.extend(memo, { [k]: v })),
@@ -168,20 +168,20 @@ function getDefaults(fd, options) {
 }
 
 function getRepositoryInformationFromGit(fs) {
-  const gitConfigIni = fs.read(".git/config");
+  const gitConfigIni = fs.read('.git/config');
   const gitConfig = ini.parse(gitConfigIni);
   const url = gitConfig['remote "origin"']
     ? gitConfig['remote "origin"'].url
-    : "";
+    : '';
   const returnValue = {
     repository: {
-      type: "git",
+      type: 'git',
       url
     }
   };
   try {
-    const repo = url.match(/github\.com[:/](.+)/i)[1].replace(/\.git$/, "");
-    if (url.includes("github.com")) {
+    const repo = url.match(/github\.com[:/](.+)/i)[1].replace(/\.git$/, '');
+    if (url.includes('github.com')) {
       returnValue.bugs = {
         url: `https://github.com/${repo}/issues`
       };

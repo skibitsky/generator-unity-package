@@ -58,8 +58,10 @@
     }
   },
   "eslintConfig": {
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
     "extends": [
-      "xo",
       "prettier"
     ],
     "env": {
@@ -75,7 +77,13 @@
   },
   "scripts": {
     "pretest": "eslint .",
-    "test": "xo && jest"
+    "test": "jest"
+  },
+  "ava": {
+    "failWithoutAssertions": false
+  },
+  "prettier": {
+    "singleQuote": true
   },
   "repository": "skibitsky/generator-unity-package",
   "license": "MIT"
